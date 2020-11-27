@@ -56,149 +56,74 @@ var styles = {
     verticalAlign: 'middle',
     borderRadius: '4px',
     width: '52px',
-    whiteSpace: 'nowrap'
-  },
-  '.skip-left': {
+    whiteSpace: 'nowrap',
+
     ':before': {
       display: 'inline-block',
       content: '""',
       verticalAlign: 'middle',
-      width: '10px',
       boxSizing: 'border-box',
-      borderColor: 'black white black white',
       borderStyle: 'solid',
-      borderWidth: '20px 0'
     },
     ':after': {
       display: 'inline-block',
       content: '""',
       verticalAlign: 'middle',
-      borderColor: 'white black white white',
+      boxSizing: 'border-box',
       borderStyle: 'solid',
-      borderWidth: '20px 28px 20px 2px',
-      boxSizing: 'border-box'
+    }
+  },
+  '.skip-left': {
+    ':before': {
+      width: '10px',
+      borderColor: 'black white black white',
+      borderWidth: '20px 0'
+    },
+    ':after': {
+      borderColor: 'white black white white',
+      borderWidth: '20px 28px 20px 2px'
     }
   },
   '.skip-right': {
     ':before': {
-      display: 'inline-block',
-      content: '""',
-      verticalAlign: 'middle',
       borderColor: 'white white white black',
-      borderStyle: 'solid',
-      borderWidth: '20px 2px 20px 28px',
-      boxSizing: 'border-box'
+      borderWidth: '20px 2px 20px 28px'
     },
     ':after': {
-      display: 'inline-block',
-      content: '""',
-      verticalAlign: 'middle',
       width: '10px',
-      boxSizing: 'border-box',
       borderColor: 'black white black white',
-      borderStyle: 'solid',
       borderWidth: '20px 0'
-    }
-  },
-  '.seek-left': {
-    ':before': {
-      display: 'inline-block',
-      content: '""',
-      verticalAlign: 'middle',
-      borderColor: 'white black white white',
-      borderStyle: 'solid',
-      borderWidth: '20px 19px 20px 0',
-      boxSizing: 'border-box'
-    },
-    ':after': {
-      display: 'inline-block',
-      content: '""',
-      verticalAlign: 'middle',
-      borderColor: 'white black white white',
-      borderStyle: 'solid',
-      borderWidth: '20px 19px 20px 2px',
-      boxSizing: 'border-box'
-    }
-  },
-  '.seek-right': {
-    ':before': {
-      display: 'inline-block',
-      content: '""',
-      verticalAlign: 'middle',
-      borderColor: 'white white white black',
-      borderStyle: 'solid',
-      borderWidth: '20px 0 20px 19px',
-      boxSizing: 'border-box'
-    },
-    ':after': {
-      display: 'inline-block',
-      content: '""',
-      verticalAlign: 'middle',
-      borderColor: 'white white white black',
-      borderStyle: 'solid',
-      borderWidth: '20px 2px 20px 19px',
-      boxSizing: 'border-box'
     }
   },
   '.play': {
     ':before': {
-      display: 'inline-block',
-      content: '""',
-      verticalAlign: 'middle',
       borderColor: 'white white white black',
-      borderStyle: 'solid',
-      borderWidth: '20px 0 20px 40px',
-      boxSizing: 'border-box',
-      // transition: 'border-width ease-in-out .3s'
+      borderWidth: '20px 0 20px 40px'
     },
     ':after': {
       height: '40px',
-      display: 'inline-block',
-      content: '""',
-      verticalAlign: 'middle',
       borderColor: 'white black white white',
-      borderStyle: 'solid',
-      borderWidth: '0 0 0 0',
-      boxSizing: 'border-box',
-      // transition: 'border-width ease-in-out .3s'
+      borderWidth: '0 0 0 0'
     }
   },
   '.pause': {
     ':before': {
       height: '40px',
-      display: 'inline-block',
-      content: '""',
-      verticalAlign: 'middle',
       borderColor: 'white white white black',
-      borderStyle: 'solid',
-      borderWidth: '0 0 0 15px',
-      boxSizing: 'border-box',
-      // transition: 'border-width ease-in-out .3s'
+      borderWidth: '0 0 0 15px'
     },
     ':after': {
       height: '40px',
-      display: 'inline-block',
-      content: '""',
-      verticalAlign: 'middle',
       borderColor: 'white black white white',
-      borderStyle: 'solid',
-      borderWidth: '0 15px 0 10px',
-      boxSizing: 'border-box',
-      // transition: 'border-width ease-in-out .3s'
+      borderWidth: '0 15px 0 10px'
     }
   },
   '.fetching': {
     ':before': {
       height: '40px',
-      display: 'inline-block',
-      content: '""',
-      verticalAlign: 'middle',
       borderColor: 'black',
-      borderStyle: 'solid',
       borderWidth: '0 40px 0 0',
       borderRadius: '50%',
-      boxSizing: 'border-box',
-      opacity: 0.3,
       animation: 'fetch-blink 1s linear infinite'
     }
   },
