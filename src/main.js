@@ -97,7 +97,7 @@ window.onload = function () {
   }
 
   function hashListener (event) {
-    var hash = event.target.location.hash.substring(1);
+    var hash = event.target.location.hash.substring(1) || '/';
     get.fs.set({ url: FS + hash }).send();
   }
 
@@ -162,6 +162,7 @@ window.onload = function () {
       var isPlaying = false;
       var cursor = 0;
       var playlist = [];
+      var currentState = 'play';
       var currentTrack;
       player.oncanplaythrough = function () {
         ifc.player.play();
@@ -174,9 +175,11 @@ window.onload = function () {
           cursor = 0;
         }
       }
+      /*
       player.onloadedmetadata = function (event) {
         console.log(event, this);
       }
+      */
 
       function isCurrent () {
         return currentTrack === playlist[cursor];
@@ -195,8 +198,12 @@ window.onload = function () {
       playerBlock.append(
         mbr.dom('div', { className: 'player-button skip-left', onclick: function () {ifc.player.prev()} }),
         // mbr.dom('div', { className: 'player-button seek-left' }),
-        mbr.dom('div', { className: 'player-button play' }, function (play) {
-          var playCN = play.cn();
+        mbr.dom('div', { className: 'player-button' }, function (play) {
+          var playCN = play.cn().add(currentState);
+
+          function setPlayState (state) {
+            playCN.del(currentState).add(currentState = state);
+          };
 
           ifc.player = {
             list: function (list) {
@@ -206,7 +213,7 @@ window.onload = function () {
                 playlist.push(list[index].path);
               }
 
-              console.log(cursor, playlist);
+              // console.log(cursor, playlist);
             },
             load: function (src) {
               cursor = getIndex(src);
@@ -215,6 +222,7 @@ window.onload = function () {
               }
 
               isPlaying = false;
+              setPlayState('fetching');
               player.src = '/get/' + src;
               currentTrack = src;
             },
@@ -243,7 +251,7 @@ window.onload = function () {
             pause: function () {
               if (isPlaying) {
                 player.pause();
-                playCN.del('pause').add('play');
+                setPlayState('play');
                 isPlaying = false;
               }
             },
@@ -253,7 +261,7 @@ window.onload = function () {
                   if (isCurrent()) {
                     player.play();
                     isPlaying = true;
-                    playCN.del('play').add('pause');
+                    setPlayState('pause');
                     ifc.player.progress();
                   } else {
                     ifc.player.load(playlist[cursor]);
@@ -269,6 +277,9 @@ window.onload = function () {
               } else {
                 ifc.player.play();
               }
+            },
+            seek: function (progress) {
+              player.currentTime = player.duration * progress;
             }
           };
 
@@ -278,6 +289,7 @@ window.onload = function () {
         }),
         // mbr.dom('div', { className: 'player-button seek-right' }),
         mbr.dom('div', { className: 'player-button skip-right', onclick: function () {ifc.player.next()} }),
+
         mbr.dom('div', { className: 'player-progress' }, function (progress) {
           var frameTime;
           var bar = mbr.dom('div', { className: 'player-progress-bar' });
@@ -286,13 +298,16 @@ window.onload = function () {
             if (time && (!frameTime || (time - frameTime) > 400)) {
               frameTime = time;
               var width = (player.currentTime / player.duration * 100);
-              console.log(player.currentTime, player.duration, width);
               bar.dom.style.width = width + '%';
             }
 
             if (isPlaying) {
               window.requestAnimationFrame(animationFrame);
             }
+          }
+
+          progress.dom.onclick = function (event) {
+            ifc.player.seek(event.offsetX / progress.dom.clientWidth);
           }
 
           ifc.player.progress = function () {

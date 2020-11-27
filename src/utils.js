@@ -18,7 +18,7 @@ const FORMAT = {
   pls: TYPE.PLAYLIST
 }
 
-const ROOT = '/Users/admin/Downloads/audio';
+const ROOT = '/home/madbrozzer/Music';
 
 function getFileType(path) {
   const extension = getExtension(path);

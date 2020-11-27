@@ -1,4 +1,15 @@
 var styles = {
+  '@keyframes fetch-blink': {
+    '0%': {
+      opacity: .8
+    },
+    '50%': {
+      opacity: .3
+    },
+    '100%': {
+      opacity: .8
+    }
+  },
   '*': {
     boxSizing: 'border-box'
   },
@@ -10,20 +21,24 @@ var styles = {
     padding: '10px',
     display: 'flex',
     alignItems: 'center',
-    justifyContent: 'center'
+    justifyContent: 'center',
+    background: 'white'
   },
   '.main': {
     width: '100%',
     maxWidth: '600px',
+    height: '100%',
+    maxHeight: '600px',
     margin: '0 auto',
-    border: '1px solid black'
+    border: '1px solid black',
+    backgroundColor: '#eee'
   },
   '.player': {
     textAlign: 'center',
     borderBottom: '1px solid black',
 
     '-progress': {
-      height: '16px',
+      height: '32px',
       border: '1px solid black',
 
       '-bar': {
@@ -134,7 +149,7 @@ var styles = {
       borderStyle: 'solid',
       borderWidth: '20px 0 20px 40px',
       boxSizing: 'border-box',
-      transition: 'border-width ease-in-out .3s'
+      // transition: 'border-width ease-in-out .3s'
     },
     ':after': {
       height: '40px',
@@ -145,7 +160,7 @@ var styles = {
       borderStyle: 'solid',
       borderWidth: '0 0 0 0',
       boxSizing: 'border-box',
-      transition: 'border-width ease-in-out .3s'
+      // transition: 'border-width ease-in-out .3s'
     }
   },
   '.pause': {
@@ -158,7 +173,7 @@ var styles = {
       borderStyle: 'solid',
       borderWidth: '0 0 0 15px',
       boxSizing: 'border-box',
-      transition: 'border-width ease-in-out .3s'
+      // transition: 'border-width ease-in-out .3s'
     },
     ':after': {
       height: '40px',
@@ -169,7 +184,22 @@ var styles = {
       borderStyle: 'solid',
       borderWidth: '0 15px 0 10px',
       boxSizing: 'border-box',
-      transition: 'border-width ease-in-out .3s'
+      // transition: 'border-width ease-in-out .3s'
+    }
+  },
+  '.fetching': {
+    ':before': {
+      height: '40px',
+      display: 'inline-block',
+      content: '""',
+      verticalAlign: 'middle',
+      borderColor: 'black',
+      borderStyle: 'solid',
+      borderWidth: '0 40px 0 0',
+      borderRadius: '50%',
+      boxSizing: 'border-box',
+      opacity: 0.3,
+      animation: 'fetch-blink 1s linear infinite'
     }
   },
   '.crumbs': {

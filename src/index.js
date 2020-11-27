@@ -5,6 +5,12 @@ const {
   getFSContent
 } = require('./utils.js');
 
+const SCRIPTS = {
+  DOM: '/../node_modules/mbr-dom/dom.js',
+  AJAX: '/../node_modules/mbr-ajax/index.js',
+  STYLE: '/../node_modules/mbr-style/index.js'
+}
+
 const TEMPLATE = {
   MAIN: {
     title: 'audio',
@@ -37,16 +43,15 @@ function getFavicon() {
 }
 
 function getMBRDom() {
-  // sendFile(this, __dirname + '/../node_modules/mbr-dom/dom.js', 'js');
-  sendFile(this, __dirname + '/../../mbr-dom/dom.js', 'js');
+  sendFile(this, __dirname + SCRIPTS.DOM, 'js');
 }
 
 function getMBRStyle() {
-  sendFile(this, __dirname + '/../../mbr-style/index.js', 'js');
+  sendFile(this, __dirname + SCRIPTS.STYLE, 'js');
 }
 
 function getMBRAjax() {
-  sendFile(this, __dirname + '/../../mbr-ajax/index.js', 'js');
+  sendFile(this, __dirname + SCRIPTS.AJAX, 'js');
 }
 
 function getMain() {
@@ -84,6 +89,7 @@ function getData(regMatch) {
       request.status = 404;
       request.send(JSON.stringify(error), 'json');
     } else {
+      request.headers['Accept-Ranges'] = 'bytes';
       request.send(data, getExtension(path));
     }
   });

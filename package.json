@@ -1,14 +1,20 @@
 {
   "name": "audio-fs",
   "version": "1.0.0",
-  "description": "",
+  "description": "Online audio player",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "MadBrozzeR",
   "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MadBrozzeR/audio.git"
+  },
   "dependencies": {
-    "mbr-dom": "^0.1.0"
+    "mbr-ajax": "^0.1.0",
+    "mbr-dom": "^0.1.0",
+    "mbr-style": "^0.2.0"
   }
 }
