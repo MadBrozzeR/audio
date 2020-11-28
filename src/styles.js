@@ -125,6 +125,9 @@ var styles = {
       borderWidth: '0 40px 0 0',
       borderRadius: '50%',
       animation: 'fetch-blink 1s linear infinite'
+    },
+    ':after': {
+      display: 'none'
     }
   },
   '.crumbs': {
@@ -159,6 +162,24 @@ var styles = {
     '-title': {
       textAlign: 'center',
       fontWeight: 'bold'
+    }
+  },
+  '.list-item': {
+    paddingLeft: '20px',
+    fontFamily: 'monospace',
+    fontSize: 'large',
+    cursor: 'pointer',
+
+    '.current': {
+      fontWeight: '900',
+
+      ':before': {
+        display: 'inline-block',
+        width: '20px',
+        marginLeft: '-20px',
+        content: '">"',
+        textAlign: 'center'
+      }
     }
   }
 };

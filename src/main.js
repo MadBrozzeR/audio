@@ -141,7 +141,7 @@ window.onload = function () {
           current = Crumb(element.name, element.link);
 
           if (last) {
-            last.neighbor(current);
+            last.neighbour(current);
           } else {
             crumbs.append(current);
           }
@@ -150,7 +150,7 @@ window.onload = function () {
         }
 
         if (counter < 0 && stack.length) {
-          last.neighbor(Crumb(stack.length, null, true));
+          last.neighbour(Crumb(stack.length, null, true));
         }
       }
     }),
@@ -159,11 +159,17 @@ window.onload = function () {
     }),
     mbr.dom('div', { className: 'player' }, function (playerBlock) {
       var player = new Audio();
+      var playlist = new Playlist();
       var isPlaying = false;
-      var cursor = 0;
-      var playlist = [];
       var currentState = 'play';
-      var currentTrack;
+      var currentTrack = {
+        track: null,
+        set: function (track) {
+          this.track && this.track.cn.del('current');
+          this.track = track;
+          this.track.cn.add('current');
+        }
+      };
       player.oncanplaythrough = function () {
         ifc.player.play();
       }
@@ -172,7 +178,7 @@ window.onload = function () {
           ifc.player.next();
         } else {
           ifc.player.pause();
-          cursor = 0;
+          playlist.first();
         }
       }
       /*
@@ -182,22 +188,13 @@ window.onload = function () {
       */
 
       function isCurrent () {
-        return currentTrack === playlist[cursor];
-      }
-
-      function getIndex (path) {
-        for (var index = 0 ; index < playlist.length ; ++index) {
-          if (playlist[index] === path) {
-            return index;
-          }
-        }
-
-        return -1;
+        return currentTrack.track
+          ? playlist.isCurrent(currentTrack.track.url)
+          : false;
       }
 
       playerBlock.append(
         mbr.dom('div', { className: 'player-button skip-left', onclick: function () {ifc.player.prev()} }),
-        // mbr.dom('div', { className: 'player-button seek-left' }),
         mbr.dom('div', { className: 'player-button' }, function (play) {
           var playCN = play.cn().add(currentState);
 
@@ -205,47 +202,41 @@ window.onload = function () {
             playCN.del(currentState).add(currentState = state);
           };
 
-          ifc.player = {
-            list: function (list) {
-              playlist = [];
-
-              for (var index = 0 ; index < list.length ; ++index) {
-                playlist.push(list[index].path);
-              }
-
-              // console.log(cursor, playlist);
+          ifc.playlist = {
+            clear: function () {
+              playlist.init();
             },
-            load: function (src) {
-              cursor = getIndex(src);
-              if (cursor < 0) {
-                cursor = 0;
-              }
+            add: function (info, element) {
+              var track = playlist.add(info.path, element.cn());
 
-              isPlaying = false;
-              setPlayState('fetching');
-              player.src = '/get/' + src;
-              currentTrack = src;
+              if (!currentTrack.track || track.url === currentTrack.track.url) {
+                currentTrack.set(track);
+              }
+            }
+          };
+          ifc.player = {
+            load: function (src) {
+              if (!isCurrent()) {
+                currentTrack.set(playlist.setTrack(src));
+              }
+              if (currentTrack.track) {
+                isPlaying = false;
+                setPlayState('fetching');
+                player.src = '/get/' + src;
+              }
             },
             next: function () {
-              cursor++;
+              var next = playlist.next();
 
-              if (!playlist[cursor]) {
-                cursor = 0;
-              }
-
-              if (playlist[cursor]) {
-                ifc.player.load(playlist[cursor]);
+              if (next) {
+                ifc.player.load(next.url);
               }
             },
             prev: function () {
-              cursor--;
+              var prev = playlist.prev();
 
-              if (!playlist[cursor]) {
-                cursor = playlist.length - 1;
-              }
-
-              if (playlist[cursor]) {
-                ifc.player.load(playlist[cursor]);
+              if (prev) {
+                ifc.player.load(prev.url);
               }
             },
             pause: function () {
@@ -257,17 +248,19 @@ window.onload = function () {
             },
             play: function () {
               if (!isPlaying) {
-                if (playlist[cursor]) {
+                var current = playlist.getCurrent();
+
+                if (current) {
                   if (isCurrent()) {
                     player.play();
                     isPlaying = true;
                     setPlayState('pause');
                     ifc.player.progress();
                   } else {
-                    ifc.player.load(playlist[cursor]);
+                    ifc.player.load(current.url);
                   }
                 } else {
-                  cursor = 0;
+                  playlist.first();
                 }
               }
             },
@@ -287,7 +280,6 @@ window.onload = function () {
             click: ifc.player.toggle
           });
         }),
-        // mbr.dom('div', { className: 'player-button seek-right' }),
         mbr.dom('div', { className: 'player-button skip-right', onclick: function () {ifc.player.next()} }),
 
         mbr.dom('div', { className: 'player-progress' }, function (progress) {
@@ -322,20 +314,19 @@ window.onload = function () {
       var items = [];
       ifc.list = function (data) {
         var index;
-        var playlist = [];
+        ifc.playlist.clear();
 
         for (index = 0 ; index < items.length ; ++index) {
           items[index].remove();
         }
         items = [];
         for (index = 0 ; index < data.length ; ++index) {
-          if (data[index].type === TYPE.AUDIO) {
-            playlist.push(data[index]);
-          }
           items[index] = ListItem(data[index]);
+          if (data[index].type === TYPE.AUDIO) {
+            ifc.playlist.add(data[index], items[index]);
+          }
           content.append(items[index]);
         }
-        ifc.player.list(playlist);
       }
     })
   )

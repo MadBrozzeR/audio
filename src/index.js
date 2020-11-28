@@ -21,7 +21,7 @@ const TEMPLATE = {
       maximumScale: 1,
       scalable: false
     },
-    scripts: ['mbr-dom', 'mbr-style', 'mbr-ajax', 'main', 'styles']
+    scripts: ['mbr-dom', 'mbr-style', 'mbr-ajax', 'main', 'styles', 'playlist']
   },
   PAGE404: {
     title: 'Not found',
@@ -60,6 +60,10 @@ function getMain() {
 
 function getStyles() {
   sendFile(this, __dirname + '/styles.js', 'js');
+}
+
+function getPlaylist() {
+  sendFile(this, __dirname + '/playlist.js', 'js');
 }
 
 function get404() {
@@ -103,6 +107,7 @@ const router = {
   '/mbr-ajax': getMBRAjax,
   '/main': getMain,
   '/styles': getStyles,
+  '/playlist': getPlaylist,
 
   default: get404
 };
