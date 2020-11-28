@@ -58,12 +58,12 @@ window.onload = function () {
 
   function ListItem (info) {
     return mbr.dom('div', {
-      className: 'list-item',
+      className: 'list-item ' + info.type,
       innerText: getFilename(info.path),
       onclick: function () {
         switch (info.type) {
           case TYPE.AUDIO:
-            ifc.player.load(info.path);
+            ifc.player.start(info.path);
             break;
           case TYPE.DIRECTORY:
             ifc.go(info.path);
@@ -165,6 +165,10 @@ window.onload = function () {
       var currentTrack = {
         track: null,
         set: function (track) {
+          if (track === this.track) {
+            return;
+          }
+
           this.track && this.track.cn.del('current');
           this.track = track;
           this.track.cn.add('current');
@@ -209,16 +213,21 @@ window.onload = function () {
             add: function (info, element) {
               var track = playlist.add(info.path, element.cn());
 
-              if (!currentTrack.track || track.url === currentTrack.track.url) {
+              if (currentTrack.track && track.url === currentTrack.track.url) {
                 currentTrack.set(track);
+                playlist.setTrack(track.url);
               }
             }
           };
           ifc.player = {
-            load: function (src) {
-              if (!isCurrent()) {
-                currentTrack.set(playlist.setTrack(src));
+            start: function (src) {
+              if (!playlist.isCurrent(src)) {
+                ifc.player.load(src);
               }
+            },
+            load: function (src) {
+              currentTrack.set(playlist.setTrack(src));
+
               if (currentTrack.track) {
                 isPlaying = false;
                 setPlayState('fetching');

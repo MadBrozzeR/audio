@@ -180,6 +180,18 @@ var styles = {
         content: '">"',
         textAlign: 'center'
       }
+    },
+
+    '.DIRECTORY': {
+      color: '#007',
+      fontWeight: '900',
+
+      ':before': {
+        content: '"[ "'
+      },
+      ':after': {
+        content: '" ]"'
+      }
     }
   }
 };
