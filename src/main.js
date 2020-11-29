@@ -131,26 +131,18 @@ window.onload = function () {
         }
         var counter = 4;
         var element = stack.pop();
-        var last, current;
 
         ifc.title(element.name);
 
-        crumbs.append(Crumb('/', '/', true));
+        var root = Crumb('/', '/', true);
+        crumbs.append(root);
 
         while (counter-- && (element = stack.pop())) {
-          current = Crumb(element.name, element.link);
-
-          if (last) {
-            last.neighbour(current);
-          } else {
-            crumbs.append(current);
-          }
-
-          last = current;
+          root.neighbour(null, Crumb(element.name, element.link));
         }
 
         if (counter < 0 && stack.length) {
-          last.neighbour(Crumb(stack.length, null, true));
+          root.neighbour(null, Crumb(stack.length, null, true));
         }
       }
     }),
@@ -158,161 +150,65 @@ window.onload = function () {
       ifc.title = function (text) { title.dom.innerText = text; }
     }),
     mbr.dom('div', { className: 'player' }, function (playerBlock) {
-      var player = new Audio();
-      var playlist = new Playlist();
-      var isPlaying = false;
-      var currentState = 'play';
-      var currentTrack = {
-        track: null,
-        set: function (track) {
-          if (track === this.track) {
-            return;
-          }
-
-          this.track && this.track.cn.del('current');
-          this.track = track;
-          this.track.cn.add('current');
-        }
-      };
-      player.oncanplaythrough = function () {
-        ifc.player.play();
-      }
-      player.onended = function () {
-        if (isCurrent()) {
-          ifc.player.next();
-        } else {
-          ifc.player.pause();
-          playlist.first();
-        }
-      }
-      /*
-      player.onloadedmetadata = function (event) {
-        console.log(event, this);
-      }
-      */
-
-      function isCurrent () {
-        return currentTrack.track
-          ? playlist.isCurrent(currentTrack.track.url)
-          : false;
-      }
+      var player = new Player();
 
       playerBlock.append(
-        mbr.dom('div', { className: 'player-button skip-left', onclick: function () {ifc.player.prev()} }),
+        mbr.dom('div', { className: 'player-button skip-left', onclick: function () {player.prev()} }),
         mbr.dom('div', { className: 'player-button' }, function (play) {
-          var playCN = play.cn().add(currentState);
+          var STATE_MAP = {};
+          STATE_MAP[Player.STATE.IDLE] = 'play';
+          STATE_MAP[Player.STATE.PLAYING] = 'pause';
+          STATE_MAP[Player.STATE.FETCHING] = 'fetching';
 
-          function setPlayState (state) {
-            playCN.del(currentState).add(currentState = state);
-          };
+          var playCN = play.cn().add(STATE_MAP[player.state]);
+
+          player.onStateChange = function (state, oldState) {
+            playCN.del(STATE_MAP[oldState]).add(STATE_MAP[state]);
+          }
 
           ifc.playlist = {
             clear: function () {
-              playlist.init();
+              player.playlist.init();
             },
             add: function (info, element) {
-              var track = playlist.add(info.path, element.cn());
+              var track = player.playlist.add(info.path, element.cn());
 
-              if (currentTrack.track && track.url === currentTrack.track.url) {
-                currentTrack.set(track);
-                playlist.setTrack(track.url);
+              if (player.track && track.url === player.track.url) {
+                player.setTrack(track);
+                player.playlist.setTrack(track.url);
               }
             }
           };
           ifc.player = {
             start: function (src) {
-              if (!playlist.isCurrent(src)) {
-                ifc.player.load(src);
+              if (!player.playlist.isCurrent(src)) {
+                player.load(src);
               }
-            },
-            load: function (src) {
-              currentTrack.set(playlist.setTrack(src));
-
-              if (currentTrack.track) {
-                isPlaying = false;
-                setPlayState('fetching');
-                player.src = '/get/' + src;
-              }
-            },
-            next: function () {
-              var next = playlist.next();
-
-              if (next) {
-                ifc.player.load(next.url);
-              }
-            },
-            prev: function () {
-              var prev = playlist.prev();
-
-              if (prev) {
-                ifc.player.load(prev.url);
-              }
-            },
-            pause: function () {
-              if (isPlaying) {
-                player.pause();
-                setPlayState('play');
-                isPlaying = false;
-              }
-            },
-            play: function () {
-              if (!isPlaying) {
-                var current = playlist.getCurrent();
-
-                if (current) {
-                  if (isCurrent()) {
-                    player.play();
-                    isPlaying = true;
-                    setPlayState('pause');
-                    ifc.player.progress();
-                  } else {
-                    ifc.player.load(current.url);
-                  }
-                } else {
-                  playlist.first();
-                }
-              }
-            },
-            toggle: function () {
-              if (isPlaying) {
-                ifc.player.pause();
-              } else {
-                ifc.player.play();
-              }
-            },
-            seek: function (progress) {
-              player.currentTime = player.duration * progress;
             }
           };
 
           play.on({
-            click: ifc.player.toggle
+            click: function () {
+              if (player.state === Player.STATE.PLAYING) {
+                player.pause();
+              } else {
+                player.play();
+              }
+            }
           });
         }),
-        mbr.dom('div', { className: 'player-button skip-right', onclick: function () {ifc.player.next()} }),
+        mbr.dom('div', { className: 'player-button skip-right', onclick: function () {player.next()} }),
 
         mbr.dom('div', { className: 'player-progress' }, function (progress) {
           var frameTime;
           var bar = mbr.dom('div', { className: 'player-progress-bar' });
 
-          function animationFrame (time) {
-            if (time && (!frameTime || (time - frameTime) > 400)) {
-              frameTime = time;
-              var width = (player.currentTime / player.duration * 100);
-              bar.dom.style.width = width + '%';
-            }
-
-            if (isPlaying) {
-              window.requestAnimationFrame(animationFrame);
-            }
+          player.onProgress = function (time, duration) {
+            var width = (time / duration * 100);
+            bar.dom.style.width = width + '%';
           }
-
           progress.dom.onclick = function (event) {
-            ifc.player.seek(event.offsetX / progress.dom.clientWidth);
-          }
-
-          ifc.player.progress = function () {
-            animationFrame();
+            player.seek(event.offsetX / progress.dom.clientWidth);
           }
 
           progress.append(bar);
