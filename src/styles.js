@@ -36,10 +36,13 @@ var styles = {
   '.player': {
     textAlign: 'center',
     borderBottom: '1px solid black',
+    display: 'flex',
 
     '-progress': {
-      height: '32px',
+      height: '42px',
       border: '1px solid black',
+      flex: 1,
+      margin: '4px',
 
       '-bar': {
         height: '100%',
@@ -49,86 +52,31 @@ var styles = {
     }
   },
   '.player-button': {
-    display: 'inline-block',
-    margin: '5px',
+    margin: '4px',
     border: '1px solid black',
-    padding: '5px',
+    padding: '4px',
     verticalAlign: 'middle',
     borderRadius: '4px',
-    width: '52px',
-    whiteSpace: 'nowrap',
+    cursor: 'pointer',
 
-    ':before': {
-      display: 'inline-block',
-      content: '""',
-      verticalAlign: 'middle',
-      boxSizing: 'border-box',
-      borderStyle: 'solid',
+    '>svg': {
+      verticalAlign: 'middle'
     },
-    ':after': {
-      display: 'inline-block',
-      content: '""',
-      verticalAlign: 'middle',
-      boxSizing: 'border-box',
-      borderStyle: 'solid',
-    }
   },
-  '.skip-left': {
-    ':before': {
-      width: '10px',
-      borderColor: 'black white black white',
-      borderWidth: '20px 0'
-    },
-    ':after': {
-      borderColor: 'white black white white',
-      borderWidth: '20px 28px 20px 2px'
-    }
-  },
-  '.skip-right': {
-    ':before': {
-      borderColor: 'white white white black',
-      borderWidth: '20px 2px 20px 28px'
-    },
-    ':after': {
-      width: '10px',
-      borderColor: 'black white black white',
-      borderWidth: '20px 0'
-    }
+  '.play-svg': { display: 'none' },
+  '.pause-svg': { display: 'none' },
+  '.fetch-svg': {
+    display: 'none',
+    animation: '1s fetch-blink linear infinite'
   },
   '.play': {
-    ':before': {
-      borderColor: 'white white white black',
-      borderWidth: '20px 0 20px 40px'
-    },
-    ':after': {
-      height: '40px',
-      borderColor: 'white black white white',
-      borderWidth: '0 0 0 0'
-    }
+    ' .play-svg': { display: 'inline-block' }
   },
   '.pause': {
-    ':before': {
-      height: '40px',
-      borderColor: 'white white white black',
-      borderWidth: '0 0 0 15px'
-    },
-    ':after': {
-      height: '40px',
-      borderColor: 'white black white white',
-      borderWidth: '0 15px 0 10px'
-    }
+    ' .pause-svg': { display: 'inline-block' }
   },
   '.fetching': {
-    ':before': {
-      height: '40px',
-      borderColor: 'black',
-      borderWidth: '0 40px 0 0',
-      borderRadius: '50%',
-      animation: 'fetch-blink 1s linear infinite'
-    },
-    ':after': {
-      display: 'none'
-    }
+    ' .fetch-svg': { display: 'inline-block' }
   },
   '.crumbs': {
     '-item': {
@@ -161,7 +109,9 @@ var styles = {
 
     '-title': {
       textAlign: 'center',
-      fontWeight: 'bold'
+      fontWeight: 'bold',
+      height: '24px',
+      lineHeight: '24px'
     }
   },
   '.list-item': {

@@ -21,7 +21,16 @@ const TEMPLATE = {
       maximumScale: 1,
       scalable: false
     },
-    scripts: ['mbr-dom', 'mbr-style', 'mbr-ajax', 'main', 'styles', 'playlist', 'player']
+    scripts: [
+      'mbr-dom',
+      'mbr-style',
+      'mbr-ajax',
+      'main',
+      'styles',
+      'playlist',
+      'player',
+      'svg'
+    ]
   },
   PAGE404: {
     title: 'Not found',
@@ -70,12 +79,16 @@ function getPlayer() {
   sendFile(this, __dirname + '/player.js', 'js');
 }
 
+function getSvg() {
+  sendFile(this, __dirname + '/svg.js', 'js');
+}
+
 function get404() {
   this.status = 404;
   this.send(this.template(TEMPLATE.PAGE404), 'htm');
 }
 
-function getFS(regMatch) {
+function fsRoute(regMatch) {
   const request = this;
 
   getFSData(regMatch[1], function (error, data) {
@@ -88,7 +101,7 @@ function getFS(regMatch) {
   });
 }
 
-function getData(regMatch) {
+function dataRoute(regMatch) {
   const request = this;
   const path = regMatch[1];
 
@@ -113,12 +126,13 @@ const router = {
   '/styles': getStyles,
   '/playlist': getPlaylist,
   '/player': getPlayer,
+  '/svg': getSvg,
 
   default: get404
 };
 
 module.exports = function (request) {
-  request.match(RE.FS, getFS)
-    || request.match(RE.DATA, getData)
+  request.match(RE.FS, fsRoute)
+    || request.match(RE.DATA, dataRoute)
     || request.route(router);
 }

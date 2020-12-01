@@ -153,7 +153,12 @@ window.onload = function () {
       var player = new Player();
 
       playerBlock.append(
-        mbr.dom('div', { className: 'player-button skip-left', onclick: function () {player.prev()} }),
+        mbr.dom('div', {
+          className: 'player-button skip-left',
+          onclick: function () {player.prev()}
+        }, function (left) {
+          left.dom.appendChild(Svg.SkipLeft());
+        }),
         mbr.dom('div', { className: 'player-button' }, function (play) {
           var STATE_MAP = {};
           STATE_MAP[Player.STATE.IDLE] = 'play';
@@ -191,16 +196,24 @@ window.onload = function () {
             click: function () {
               if (player.state === Player.STATE.PLAYING) {
                 player.pause();
-              } else {
+              } else if (player.state === Player.STATE.IDLE) {
                 player.play();
               }
             }
           });
+
+          play.dom.appendChild(Svg.Play());
+          play.dom.appendChild(Svg.Pause());
+          play.dom.appendChild(Svg.Fetch());
         }),
-        mbr.dom('div', { className: 'player-button skip-right', onclick: function () {player.next()} }),
+        mbr.dom('div', {
+          className: 'player-button skip-right',
+          onclick: function () {player.next()}
+        }, function (right) {
+          right.dom.appendChild(Svg.SkipRight());
+        }),
 
         mbr.dom('div', { className: 'player-progress' }, function (progress) {
-          var frameTime;
           var bar = mbr.dom('div', { className: 'player-progress-bar' });
 
           player.onProgress = function (time, duration) {
