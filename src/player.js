@@ -10,7 +10,7 @@ function Player () {
   this.onProgress = null;
   this.progressDelay = 400;
 
-  this.audio.oncanplaythrough = function () {
+  this.audio.oncanplay = function () {
     player.play();
   }
   this.audio.onended = function () {

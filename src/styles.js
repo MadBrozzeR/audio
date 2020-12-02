@@ -31,7 +31,8 @@ var styles = {
     maxHeight: '600px',
     margin: '0 auto',
     border: '1px solid black',
-    backgroundColor: '#eee'
+    backgroundColor: '#eee',
+    paddingTop: '106px'
   },
   '.player': {
     textAlign: 'center',
@@ -79,6 +80,8 @@ var styles = {
     ' .fetch-svg': { display: 'inline-block' }
   },
   '.crumbs': {
+    marginTop: '-106px',
+
     '-item': {
       display: 'inline-block',
       width: '20%',
@@ -143,5 +146,9 @@ var styles = {
         content: '" ]"'
       }
     }
+  },
+  '.content': {
+    height: '100%',
+    overflowY: 'auto'
   }
 };
