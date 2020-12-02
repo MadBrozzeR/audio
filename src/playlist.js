@@ -2,7 +2,14 @@ function Playlist() {
   this.init();
 }
 Playlist.prototype.add = function (url, cn) {
+  var slashPos = url.lastIndexOf('/');
+  var dotPos = url.lastIndexOf('.');
+  if (dotPos === -1) {
+    dotPos = url.length;
+  }
+
   var item = {
+    title: url.substring(slashPos + 1, dotPos),
     url: url,
     cn: cn
   };

@@ -56,6 +56,15 @@ window.onload = function () {
     return path.substring(slashPosition + 1);
   }
 
+  function formatTime(time) {
+    var minutes = Math.floor(time / 60);
+    var seconds = Math.floor(time % 60);
+
+    return (minutes < 10 ? ('0' + minutes) : minutes) +
+      ':' +
+      (seconds < 10 ? ('0' + seconds) : seconds);
+  }
+
   function ListItem (info) {
     return mbr.dom('div', {
       className: 'list-item ' + info.type,
@@ -215,16 +224,27 @@ window.onload = function () {
 
         mbr.dom('div', { className: 'player-progress' }, function (progress) {
           var bar = mbr.dom('div', { className: 'player-progress-bar' });
+          var trackBlock = mbr.dom('div', { className: 'player-track' });
+          var positionBlock = mbr.dom('div', { className: 'player-position' });
+          var durationBlock = mbr.dom('div', { className: 'player-duration' });
 
           player.onProgress = function (time, duration) {
             var width = (time / duration * 100);
             bar.dom.style.width = width + '%';
+            positionBlock.dom.innerText = formatTime(time);
           }
           progress.dom.onclick = function (event) {
             player.seek(event.offsetX / progress.dom.clientWidth);
           }
 
-          progress.append(bar);
+          progress.append(bar, trackBlock, positionBlock, durationBlock);
+
+          player.onTrackChange = function (track) {
+            trackBlock.dom.innerText = track.title;
+            durationBlock.dom.innerText = this.audio.duration ? formatTime(this.audio.duration) : '?';
+            positionBlock.dom.innerText = '0';
+            bar.dom.style.width = 0;
+          }
         })
       );
     }),

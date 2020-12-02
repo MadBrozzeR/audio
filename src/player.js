@@ -8,6 +8,7 @@ function Player () {
   this.track = null;
   this.onStateChange = null;
   this.onProgress = null;
+  this.onTrackChange = null;
   this.progressDelay = 400;
 
   this.audio.oncanplay = function () {
@@ -21,6 +22,16 @@ function Player () {
       player.playlist.first();
     }
   }
+  this.audio.ondurationchange = function () {
+    (player.onTrackChange instanceof Function) && player.onTrackChange(player.track);
+  }
+
+  Player.session.actions({
+    play: function () { player.play(); },
+    pause: function () { player.pause() },
+    nexttrack: function () { player.next() },
+    previoustrack: function () { player.prev() }
+  });
 
   this.animationFrame = function (time) {
     if (
@@ -45,6 +56,8 @@ Player.prototype.setTrack = function (track) {
   this.track && this.track.cn.del('current');
   this.track = track;
   this.track.cn.add('current');
+  (this.onTrackChange instanceof Function) && this.onTrackChange(this.track);
+  Player.session.meta({ title: this.track.title });
 }
 Player.prototype.setState = function (state) {
   if (state === this.state) {
@@ -88,6 +101,7 @@ Player.prototype.pause = function () {
   if (this.state === Player.STATE.PLAYING) {
     this.audio.pause();
     this.setState(Player.STATE.IDLE);
+    Player.session.state('paused');
   }
 }
 Player.prototype.play = function () {
@@ -99,6 +113,7 @@ Player.prototype.play = function () {
         this.audio.play();
         this.setState(Player.STATE.PLAYING);
         this.animationFrame();
+        Player.session.state('playing');
       } else {
         this.load(current.url);
       }
@@ -109,6 +124,34 @@ Player.prototype.play = function () {
 }
 Player.prototype.seek = function (progress) {
   this.audio.currentTime = this.audio.duration * progress;
+}
+Player.session = {
+  meta: function (data) {
+    try {
+      navigator.mediaSession.metadata = new MediaMetadata(data);
+    } catch (error) {
+      console.warn('MediaSession error');
+      console.warn(error);
+    }
+  },
+  actions: function (actions) {
+    try {
+      for (var name in actions) {
+        navigator.mediaSession.setActionHandler(name, actions[name]);
+      }
+    } catch (error) {
+      console.warn('MediaSession error');
+      console.warn(error);
+    }
+  },
+  state: function (state) {
+    try {
+      navigator.mediaSession.playbackState = state;
+    } catch (error) {
+      console.warn('MediaSession error');
+      console.warn(error);
+    }
+  }
 }
 
 Player.STATE = {

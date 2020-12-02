@@ -44,12 +44,37 @@ var styles = {
       border: '1px solid black',
       flex: 1,
       margin: '4px',
+      position: 'relative',
 
       '-bar': {
         height: '100%',
         width: '0',
         background: '#99e'
       }
+    },
+
+    '-track': {
+      position: 'absolute',
+      top: '2px',
+      left: '4px',
+      width: '100%',
+      overflow: 'hidden',
+      textOverflow: 'ellipsis',
+      whiteSpace: 'nowrap',
+      textAlign: 'left',
+      fontSize: '12px'
+    },
+    '-position': {
+      position: 'absolute',
+      top: '2px',
+      right: '2px',
+      fontSize: '12px'
+    },
+    '-duration': {
+      position: 'absolute',
+      bottom: '2px',
+      right: '2px',
+      fontSize: '12px'
     }
   },
   '.player-button': {
@@ -118,10 +143,11 @@ var styles = {
     }
   },
   '.list-item': {
-    paddingLeft: '20px',
+    padding: '4px 4px 4px 20px',
     fontFamily: 'monospace',
-    fontSize: 'large',
+    fontSize: '16px',
     cursor: 'pointer',
+    whiteSpace: 'nowrap',
 
     '.current': {
       fontWeight: '900',
