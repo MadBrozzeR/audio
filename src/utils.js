@@ -1,4 +1,5 @@
 const fs = require('fs');
+const config = require('./config.js');
 
 const TYPE = {
   DIRECTORY: 'DIRECTORY',
@@ -18,7 +19,7 @@ const FORMAT = {
   pls: TYPE.PLAYLIST
 }
 
-const ROOT = '/home/madbrozzer/Music';
+const ROOT = config.root;
 
 function getFileType(path) {
   const extension = getExtension(path);

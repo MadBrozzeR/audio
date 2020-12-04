@@ -18,7 +18,7 @@ window.onload = function () {
       onresponse: function (response) {
         var data;
 
-        if (this.state = this.STATE.SUCCESS) {
+        if (this.state === this.STATE.SUCCESS) {
           data = JSON.parse(response);
           ifc.crumbs(data.path);
 
