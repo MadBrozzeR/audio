@@ -5,11 +5,20 @@ const {
   getFSContent
 } = require('./utils.js');
 
-const SCRIPTS = {
-  DOM: '/../node_modules/mbr-dom/dom.js',
-  AJAX: '/../node_modules/mbr-ajax/index.js',
-  STYLE: '/../node_modules/mbr-style/index.js'
-}
+const PROJECT_ROOT = __dirname + '/../../';
+const CLIENT_ROOT = PROJECT_ROOT + 'src/client/';
+
+const RESOURCES = {
+  '/mbr-dom': [PROJECT_ROOT + 'node_modules/mbr-dom/dom.js', 'js'],
+  '/mbr-ajax': [PROJECT_ROOT + 'node_modules/mbr-ajax/index.js', 'js'],
+  '/mbr-style': [PROJECT_ROOT + 'node_modules/mbr-style/index.js', 'js'],
+  '/main': [CLIENT_ROOT + 'main.js', 'js'],
+  '/styles': [CLIENT_ROOT + 'styles.js', 'js'],
+  '/playlist': [CLIENT_ROOT + 'playlist.js', 'js'],
+  '/player': [CLIENT_ROOT + 'player.js', 'js'],
+  '/svg': [CLIENT_ROOT + 'svg.js', 'js']
+};
+const RESOURCE_KEYS = Object.keys(RESOURCES);
 
 const TEMPLATE = {
   MAIN: {
@@ -21,16 +30,7 @@ const TEMPLATE = {
       maximumScale: 1,
       scalable: false
     },
-    scripts: [
-      'mbr-dom',
-      'mbr-style',
-      'mbr-ajax',
-      'main',
-      'styles',
-      'playlist',
-      'player',
-      'svg'
-    ]
+    scripts: RESOURCE_KEYS
   },
   PAGE404: {
     title: 'Not found',
@@ -51,37 +51,15 @@ function getFavicon() {
   this.send('', 'ico');
 }
 
-function getMBRDom() {
-  sendFile(this, __dirname + SCRIPTS.DOM, 'js');
+function getResource() {
+  const resource = RESOURCES[this.getPath()];
+  sendFile(this, resource);
 }
+getResource.ROUTES = RESOURCE_KEYS.reduce(function (result, name) {
+  result[name] = getResource;
 
-function getMBRStyle() {
-  sendFile(this, __dirname + SCRIPTS.STYLE, 'js');
-}
-
-function getMBRAjax() {
-  sendFile(this, __dirname + SCRIPTS.AJAX, 'js');
-}
-
-function getMain() {
-  sendFile(this, __dirname + '/main.js', 'js');
-}
-
-function getStyles() {
-  sendFile(this, __dirname + '/styles.js', 'js');
-}
-
-function getPlaylist() {
-  sendFile(this, __dirname + '/playlist.js', 'js');
-}
-
-function getPlayer() {
-  sendFile(this, __dirname + '/player.js', 'js');
-}
-
-function getSvg() {
-  sendFile(this, __dirname + '/svg.js', 'js');
-}
+  return result;
+}, {});
 
 function get404() {
   this.status = 404;
@@ -119,14 +97,7 @@ function dataRoute(regMatch) {
 const router = {
   '/': getIndex,
   '/favicon.ico': getFavicon,
-  '/mbr-dom': getMBRDom,
-  '/mbr-style': getMBRStyle,
-  '/mbr-ajax': getMBRAjax,
-  '/main': getMain,
-  '/styles': getStyles,
-  '/playlist': getPlaylist,
-  '/player': getPlayer,
-  '/svg': getSvg,
+  ...getResource.ROUTES,
 
   default: get404
 };

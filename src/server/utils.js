@@ -27,15 +27,22 @@ function getFileType(path) {
   return FORMAT[extension] || TYPE.UNSUPPORTED
 }
 
-function sendFile(request, path, ext) {
-  fs.readFile(path, function (error, data) {
-    if (error) {
-      request.status = 404;
-      request.send(JSON.stringify(error), 'json');
-    } else {
-      request.send(data, ext);
-    }
-  });
+function sendFile(request, resource) {
+  if (resource) {
+    const [path, ext] = resource;
+
+    fs.readFile(path, function (error, data) {
+      if (error) {
+        request.status = 404;
+        request.send(JSON.stringify(error), 'json');
+      } else {
+        request.send(data, ext);
+      }
+    });
+  } else {
+    request.status = 404;
+    request.send('<html><body>Resource doesn\'t exist</body></html>', 'htm');
+  }
 }
 
 function parsePath(path) {

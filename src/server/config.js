@@ -1,6 +1,6 @@
 const fs = require('fs');
 
-const path = __dirname + '/config.json';
+const path = __dirname + '/../config.json';
 
 const defaults = {
   root: __dirname + '/test'
