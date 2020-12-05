@@ -15,15 +15,19 @@ window.onload = function () {
   var get = {
     fs: mbr.ajax({
       url: FS,
+      onrequest: function () {
+        ifc.fs.showCurtain();
+      },
       onresponse: function (response) {
         var data;
 
+        ifc.fs.hideCurtain();
         if (this.state === this.STATE.SUCCESS) {
           data = JSON.parse(response);
           ifc.crumbs(data.path);
 
           if (data.type === TYPE.DIRECTORY) {
-            ifc.list(data.content.sort(listSorter));
+            ifc.fs.list(data.content.sort(listSorter));
           }
         }
       }
@@ -56,7 +60,7 @@ window.onload = function () {
     return path.substring(slashPosition + 1);
   }
 
-  function formatTime(time) {
+  function formatTime (time) {
     var minutes = Math.floor(time / 60);
     var seconds = Math.floor(time % 60);
 
@@ -65,21 +69,77 @@ window.onload = function () {
       (seconds < 10 ? ('0' + seconds) : seconds);
   }
 
-  function ListItem (info) {
-    return mbr.dom('div', {
-      className: 'list-item ' + info.type,
-      innerText: getFilename(info.path),
-      onclick: function () {
-        switch (info.type) {
-          case TYPE.AUDIO:
-            ifc.player.start(info.path);
-            break;
-          case TYPE.DIRECTORY:
+  var SIZE = {};
+  SIZE.K = 1024;
+  SIZE.M = SIZE.K * 1024;
+  SIZE.G = SIZE.M * 1024;
+
+  function formatSize (size) {
+    if (size > SIZE.G) {
+      return Math.round(size / SIZE.G * 100) / 100 + ' G';
+    }
+    if (size > SIZE.M) {
+      return Math.round(size / SIZE.M * 100) / 100 + ' M';
+    }
+    if (size > SIZE.K) {
+      return Math.round(size / SIZE.K * 100) / 100 + ' K';
+    }
+    return size;
+  }
+
+  function ListItem (info, onCNSwitch) {
+    switch (info.type) {
+      case TYPE.DIRECTORY:
+        return mbr.dom('div', {
+          className: 'list-item ' + info.type,
+          innerText: getFilename(info.path),
+          onclick: function () {
             ifc.go(info.path);
-            break;
-        }
-      }
-    });
+          }
+        });
+      case TYPE.AUDIO:
+        return mbr.dom('div', {
+          className: 'list-item ' + info.type
+        }, function (listItem) {
+          var fileName = getFilename(info.path);
+          var controlCN;
+
+          listItem.append(
+            mbr.dom('div', {
+              className: 'list-item-name',
+              innerText: fileName,
+              onclick: function () {
+                onCNSwitch(controlCN)
+                controlCN.add('active');
+              }
+            }),
+            mbr.dom('div', {
+              className: 'list-item-size',
+              innerText: formatSize(info.size)
+            }),
+            control = mbr.dom('div', {
+              className: 'list-item-control'
+            }, function (control) {
+              controlCN = control.cn();
+              var play = Svg.Play();
+
+              play.onclick = function () {
+                ifc.player.start(info.path);
+              }
+
+              control.dom.appendChild(
+                play
+              );
+              control.append(mbr.dom('div', {
+                innerText: fileName,
+                onclick: function () {
+                  controlCN.del('active');
+                }
+              }));
+            })
+          );
+        });
+    }
   }
 
   function Crumb (name, link, short) {
@@ -249,23 +309,45 @@ window.onload = function () {
       );
     }),
     mbr.dom('div', { className: 'content' }, function (content) {
+      var curtain = mbr.dom('div', { className: 'curtain' });
+      var curtainCN = curtain.cn();
+      var list = mbr.dom('div', { className: 'content-list' });
       var items = [];
-      ifc.list = function (data) {
-        var index;
-        ifc.playlist.clear();
+      var lastControlCN;
 
-        for (index = 0 ; index < items.length ; ++index) {
-          items[index].remove();
+      function handleCNSwitcher(controlCN) {
+        if (lastControlCN) {
+          lastControlCN.del('active');
         }
-        items = [];
-        for (index = 0 ; index < data.length ; ++index) {
-          items[index] = ListItem(data[index]);
-          if (data[index].type === TYPE.AUDIO) {
-            ifc.playlist.add(data[index], items[index]);
-          }
-          content.append(items[index]);
-        }
+
+        lastControlCN = controlCN;
       }
+
+      content.append(curtain, list);
+      ifc.fs = {
+        showCurtain: function () {
+          curtainCN.add('active');
+        },
+        hideCurtain: function () {
+          curtainCN.del('active');
+        },
+        list: function (data) {
+          var index;
+          ifc.playlist.clear();
+
+          for (index = 0 ; index < items.length ; ++index) {
+            items[index].remove();
+          }
+          items = [];
+          for (index = 0 ; index < data.length ; ++index) {
+            items[index] = ListItem(data[index], handleCNSwitcher);
+            if (data[index].type === TYPE.AUDIO) {
+              ifc.playlist.add(data[index], items[index]);
+            }
+            list.append(items[index]);
+          }
+        }
+      };
     })
   )
 
