@@ -166,9 +166,16 @@ function getExtension(path) {
   return path.substring(dotPosition + 1);
 }
 
+function getFilename (path) {
+  const slashPos = path.lastIndexOf('/');
+
+  return path.substring(slashPos + 1);
+}
+
 module.exports = {
   sendFile,
   getFSData,
   getExtension,
+  getFilename,
   getFSContent
 };

@@ -2,6 +2,7 @@ const {
   sendFile,
   getFSData,
   getExtension,
+  getFilename,
   getFSContent
 } = require('./utils.js');
 
@@ -89,6 +90,7 @@ function dataRoute(regMatch) {
       request.send(JSON.stringify(error), 'json');
     } else {
       request.headers['Accept-Ranges'] = 'bytes';
+      request.headers['Content-Disposition'] = 'attachment; filename=' + getFilename(path);
       request.send(data, getExtension(path));
     }
   });

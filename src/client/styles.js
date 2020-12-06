@@ -18,7 +18,7 @@ var styles = {
     margin: 0
   },
   'body': {
-    padding: '10px',
+    padding: '5px',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -204,9 +204,10 @@ var styles = {
       bottom: '50%',
       background: '#f9f9f9',
       overflow: 'hidden',
+      boxShadow: '0 0 3px #777',
       transition: 'bottom .2s ease-in-out, top .2s ease-in-out',
 
-      ' .play-svg': {
+      ' svg': {
         display: 'inline-block',
         width: '16px',
         margin: '0 5px'

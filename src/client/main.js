@@ -5,6 +5,7 @@ window.onload = function () {
   mbr.stylesheet(styles, head);
 
   const FS = '/fs';
+  const GET = '/get';
   const TYPE = {
     DIRECTORY: 'DIRECTORY',
     AUDIO: 'AUDIO'
@@ -26,8 +27,13 @@ window.onload = function () {
           data = JSON.parse(response);
           ifc.crumbs(data.path);
 
-          if (data.type === TYPE.DIRECTORY) {
-            ifc.fs.list(data.content.sort(listSorter));
+          switch (data.type) {
+            case TYPE.DIRECTORY:
+              ifc.fs.list(data.content.sort(listSorter));
+              break;
+            case TYPE.AUDIO:
+              ifc.fs.list([data]);
+              break;
           }
         }
       }
@@ -121,21 +127,29 @@ window.onload = function () {
               className: 'list-item-control'
             }, function (control) {
               controlCN = control.cn();
-              var play = Svg.Play();
-
-              play.onclick = function () {
-                ifc.player.start(info.path);
-              }
 
               control.dom.appendChild(
-                play
+                Svg.Play(function () {
+                  ifc.player.start(info.path);
+                })
               );
               control.append(mbr.dom('div', {
                 innerText: fileName,
+                className: 'list-item-name',
                 onclick: function () {
                   controlCN.del('active');
                 }
               }));
+              control.dom.appendChild(
+                Svg.GoTo(function () {
+                  ifc.go(info.path);
+                })
+              );
+              control.dom.appendChild(
+                Svg.Download(function () {
+                  window.location.href = GET + info.path;
+                })
+              );
             })
           );
         });
@@ -353,5 +367,4 @@ window.onload = function () {
 
   window.addEventListener('hashchange', hashListener);
   hashListener({ target: window });
-  // get.fs.send();
 }
