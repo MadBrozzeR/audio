@@ -3,12 +3,14 @@ function Player () {
   var frameTime;
 
   this.audio = new Audio();
+  this.audio.autoplay = true;
   this.playlist = new Playlist();
   this.state = Player.STATE.IDLE;
   this.track = null;
   this.onStateChange = null;
   this.onProgress = null;
   this.onTrackChange = null;
+  this.onDebug = null;
   this.progressDelay = 400;
 
   this.audio.oncanplay = function () {
@@ -47,6 +49,9 @@ function Player () {
       window.requestAnimationFrame(player.animationFrame);
     }
   }
+}
+Player.prototype.debug = function (message) {
+  (this.onDebug instanceof Function) && this.onDebug(message);
 }
 Player.prototype.setTrack = function (track) {
   if (this.track === track) {

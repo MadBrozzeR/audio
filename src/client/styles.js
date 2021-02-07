@@ -258,5 +258,19 @@ var styles = {
       opacity: '.7',
       animation: '1s fetch-blink linear infinite'
     }
+  },
+  '.notification-manager': {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    width: '100%',
+    maxWidth: '500px',
+
+    ' .notification': {
+      width: '100%',
+      backgroundColor: 'red',
+      padding: '4px',
+      border: '1px solid #422'
+    }
   }
 };

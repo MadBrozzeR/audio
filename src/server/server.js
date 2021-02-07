@@ -3,7 +3,8 @@ const {
   getFSData,
   getExtension,
   getFilename,
-  getFSContent
+  getFSContent,
+  getRange
 } = require('./utils.js');
 
 const PROJECT_ROOT = __dirname + '/../../';
@@ -89,9 +90,14 @@ function dataRoute(regMatch) {
       request.status = 404;
       request.send(JSON.stringify(error), 'json');
     } else {
+      const range = getRange(request, data);
       request.headers['Accept-Ranges'] = 'bytes';
       request.headers['Content-Disposition'] = 'attachment; filename=' + getFilename(path);
-      request.send(data, getExtension(path));
+      if (range) {
+        request.send(range, getExtension(path));
+      } else {
+        request.send(data, getExtension(path));
+      }
     }
   });
 }
