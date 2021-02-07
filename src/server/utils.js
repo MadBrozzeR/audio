@@ -21,6 +21,10 @@ const FORMAT = {
 
 const ROOT = config.root;
 
+const RE = {
+  RANGE_HEADER: /^(bytes)=(\d+)-(\d+)$/,
+};
+
 function getFileType(path) {
   const extension = getExtension(path);
 
@@ -171,11 +175,30 @@ function getFilename (path) {
 
   return path.substring(slashPos + 1);
 }
+function getRange(request, data) {
+  const range = RE.RANGE_HEADER.exec(request.request.headers.range);
+
+  if (!range) {
+    return null;
+  }
+
+  const start = parseInt(range[2], 10);
+  const stop = parseInt(range[3], 10) + 1;
+
+  const result = data.slice(start, stop);
+
+  request.status = 206;
+  request.headers['Content-Range'] = 'bytes ' + start + '-' + stop + '/' + data.length;
+  request.headers['Content-Length'] = result.length;
+
+  return result;
+}
 
 module.exports = {
   sendFile,
   getFSData,
   getExtension,
   getFilename,
-  getFSContent
+  getFSContent,
+  getRange
 };

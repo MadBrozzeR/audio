@@ -234,6 +234,7 @@ window.onload = function () {
     }),
     mbr.dom('div', { className: 'player' }, function (playerBlock) {
       var player = new Player();
+      player.onDebug = function (message) {ifc.notify(message)};
 
       playerBlock.append(
         mbr.dom('div', {
@@ -314,6 +315,7 @@ window.onload = function () {
           progress.append(bar, trackBlock, positionBlock, durationBlock);
 
           player.onTrackChange = function (track) {
+            ifc.notify(this.audio.duration);
             trackBlock.dom.innerText = track.title;
             durationBlock.dom.innerText = this.audio.duration ? formatTime(this.audio.duration) : '?';
             positionBlock.dom.innerText = '0';
@@ -361,6 +363,14 @@ window.onload = function () {
             list.append(items[index]);
           }
         }
+      };
+    }),
+
+    mbr.dom('div', { className: 'notification-manager' }, function (manager) {
+      ifc.notify = function (message) {
+        var notification = mbr.dom('div', { className: 'notification', innerText: message });
+        manager.append(notification);
+        setTimeout(function () { notification.remove() }, 5000);
       };
     })
   )
