@@ -315,7 +315,6 @@ window.onload = function () {
           progress.append(bar, trackBlock, positionBlock, durationBlock);
 
           player.onTrackChange = function (track) {
-            ifc.notify(this.audio.duration);
             trackBlock.dom.innerText = track.title;
             durationBlock.dom.innerText = this.audio.duration ? formatTime(this.audio.duration) : '?';
             positionBlock.dom.innerText = '0';
