@@ -99,10 +99,12 @@ function dataRoute(regMatch) {
 const router = {
   '/': getIndex,
   '/favicon.ico': getFavicon,
-  ...getResource.ROUTES,
 
   default: get404
 };
+for (const path in RESOURCES) {
+  router[path] = getResource;
+}
 
 module.exports = function (request) {
   request.match(RE.FS, fsRoute)
