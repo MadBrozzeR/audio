@@ -183,6 +183,11 @@ var styles = {
       }
     },
 
+    '.UNSUPPORTED': {
+      opacity: .6,
+      cursor: 'not-allowed'
+    },
+
     '-name': {
       flex: 1,
       overflow: 'hidden',

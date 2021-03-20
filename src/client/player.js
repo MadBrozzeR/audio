@@ -85,7 +85,7 @@ Player.prototype.load = function (src) {
 
   if (this.track) {
     this.setState(Player.STATE.FETCHING);
-    this.audio.src = '/get/' + src;
+    this.audio.src = '/get/' + encodeURIComponent(src);
   }
 }
 Player.prototype.next = function () {

@@ -153,6 +153,11 @@ window.onload = function () {
             })
           );
         });
+      default:
+        return mbr.dom('div', {
+          className: 'list-item ' + info.type,
+          innerText: getFilename(info.path)
+        });
     }
   }
 
