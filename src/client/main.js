@@ -4,9 +4,9 @@ window.onload = function () {
 
   mbr.stylesheet(styles, head);
 
-  const FS = '/fs';
-  const GET = '/get';
-  const TYPE = {
+  var FS = '/fs';
+  var GET = '/get';
+  var TYPE = {
     DIRECTORY: 'DIRECTORY',
     AUDIO: 'AUDIO'
   };
@@ -256,6 +256,14 @@ window.onload = function () {
 
           var playCN = play.cn().add(STATE_MAP[player.state]);
 
+          function togglePlay() {
+            if (player.state === Player.STATE.PLAYING) {
+              player.pause();
+            } else if (player.state === Player.STATE.IDLE) {
+              player.play();
+            }
+          }
+
           player.onStateChange = function (state, oldState) {
             playCN.del(STATE_MAP[oldState]).add(STATE_MAP[state]);
           }
@@ -275,21 +283,15 @@ window.onload = function () {
           };
           ifc.player = {
             start: function (src) {
-              if (!player.playlist.isCurrent(src)) {
+              if (player.playlist.isCurrent(src)) {
+                togglePlay();
+              } else {
                 player.load(src);
               }
             }
           };
 
-          play.on({
-            click: function () {
-              if (player.state === Player.STATE.PLAYING) {
-                player.pause();
-              } else if (player.state === Player.STATE.IDLE) {
-                player.play();
-              }
-            }
-          });
+          play.on({click: togglePlay});
 
           play.dom.appendChild(Svg.Play());
           play.dom.appendChild(Svg.Pause());
